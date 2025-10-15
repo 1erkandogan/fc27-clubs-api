@@ -20,7 +20,7 @@ These instructions will get you a copy of the project up and running on your loc
    ```
 2. Install the required libraries:
    ```bash
-   pip install pandas requests
+   pip install -r requirements.txt
    ```
 
 ## Usage
