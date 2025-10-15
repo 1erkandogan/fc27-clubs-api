@@ -35,7 +35,7 @@ def request_builder(url, params=None):
         print(f"Failed to decode JSON: {e}")
         return None
 
-def get_club_details(club_id: str) -> Optional[pd.DataFrame]:
+def get_club_details(club_id):
     """
     Retrieves detailed information about a specific club.
 
@@ -49,7 +49,7 @@ def get_club_details(club_id: str) -> Optional[pd.DataFrame]:
     params = {"platform": "common-gen5", "clubIds": club_id}
     return request_builder(url, params=params)
 
-def search_club_by_name(club_name: str) -> Optional[pd.DataFrame]:
+def search_club_by_name(club_name):
     """
     Searches for a club by its name.
 
