@@ -61,7 +61,12 @@ def search_club_by_name(club_name):
     """
     url = "https://proclubs.ea.com/api/fc/allTimeLeaderboard/search"
     params = {"platform": "common-gen5", "clubName": club_name}
-    return request_builder(url, params=params)
+    club = request_builder(url, params=params)
+    normalized_clubInfo = pd.json_normalize(club['clubInfo'])
+    prefix = 'clubInfo.'
+    normalized_club = normalized_clubInfo.add_prefix(prefix)
+    final_club_results = pd.concat([club.drop(columns=['clubInfo']), normalized_club], axis=1)
+    return final_club_results
 
 if __name__ == "__main__":
     # Example 1: Get club details by ID
