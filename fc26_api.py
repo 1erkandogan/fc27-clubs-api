@@ -35,7 +35,14 @@ def request_builder(url, params=None):
         print(f"Failed to decode JSON: {e}")
         return None
 
+def normalizer(df, prefix):
+    normalized_df = pd.json_normalize(df[prefix])
+    normalized_df = normalized_df.add_prefix(prefix)
+    final_df = pd.concat([df.drop(columns=[prefix]), normalized_df], axis=1)
+    return final_df
+
 def get_club_details(club_id):
+    #TODO Check the normalization for the json
     """
     Retrieves detailed information about a specific club.
 
@@ -47,7 +54,8 @@ def get_club_details(club_id):
     """
     url = "https://proclubs.ea.com/api/fc/clubs/info"
     params = {"platform": "common-gen5", "clubIds": club_id}
-    return request_builder(url, params=params)
+    # return normalizer(request_builder(url, params=params).T, "customKit")
+    return request_builder(url, params=params).T
 
 def search_club_by_name(club_name):
     """
@@ -62,11 +70,16 @@ def search_club_by_name(club_name):
     url = "https://proclubs.ea.com/api/fc/allTimeLeaderboard/search"
     params = {"platform": "common-gen5", "clubName": club_name}
     club = request_builder(url, params=params)
-    normalized_clubInfo = pd.json_normalize(club['clubInfo'])
-    prefix = 'clubInfo.'
-    normalized_club = normalized_clubInfo.add_prefix(prefix)
-    final_club_results = pd.concat([club.drop(columns=['clubInfo']), normalized_club], axis=1)
-    return final_club_results
+    return normalizer(club, "clubInfo")
+
+def get_club_matches(club_id, match_type = "friendlyMatch"):
+    """
+    match_type: friendlyMatch, leagueMatch, playoffMatch
+    """
+    url = f"https://proclubs.ea.com/api/fc/clubs/matches"
+    params = {"platform": "common-gen5", "clubIds": club_id, "matchType": match_type, "maxResultCount": 10}
+
+    return request_builder(url, params=params)
 
 if __name__ == "__main__":
     # Example 1: Get club details by ID
