@@ -35,14 +35,29 @@ def request_builder(url, params=None):
         print(f"Failed to decode JSON: {e}")
         return None
 
+def timestamp_to_datetime(timestamp):
+    return pd.to_datetime(timestamp, unit='s') + pd.Timedelta(hours=2)
+
 def normalizer(df, prefix):
     normalized_df = pd.json_normalize(df[prefix])
     normalized_df = normalized_df.add_prefix(prefix)
     final_df = pd.concat([df.drop(columns=[prefix]), normalized_df], axis=1)
     return final_df
 
-def timestamp_to_datetime(timestamp):
-    return pd.to_datetime(timestamp, unit='s') + pd.Timedelta(hours=2)
+def search_club_by_name(club_name):
+    """
+    Searches for a club by its name.
+
+    Args:
+        club_name: The name of the club to search for.
+
+    Returns:
+        A pandas DataFrame containing a list of matching clubs, or None if the request fails.
+    """
+    url = "https://proclubs.ea.com/api/fc/allTimeLeaderboard/search"
+    params = {"platform": "common-gen5", "clubName": club_name}
+    club = request_builder(url, params=params)
+    return normalizer(club, "clubInfo")
 
 def get_club_details(club_id):
     #TODO Check the normalization for the json
@@ -60,20 +75,7 @@ def get_club_details(club_id):
     # return normalizer(request_builder(url, params=params).T, "customKit")
     return request_builder(url, params=params).T
 
-def search_club_by_name(club_name):
-    """
-    Searches for a club by its name.
 
-    Args:
-        club_name: The name of the club to search for.
-
-    Returns:
-        A pandas DataFrame containing a list of matching clubs, or None if the request fails.
-    """
-    url = "https://proclubs.ea.com/api/fc/allTimeLeaderboard/search"
-    params = {"platform": "common-gen5", "clubName": club_name}
-    club = request_builder(url, params=params)
-    return normalizer(club, "clubInfo")
 
 def get_club_matches(club_id, match_type = "friendlyMatch"):
     """
