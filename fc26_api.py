@@ -41,6 +41,9 @@ def normalizer(df, prefix):
     final_df = pd.concat([df.drop(columns=[prefix]), normalized_df], axis=1)
     return final_df
 
+def timestamp_to_datetime(timestamp):
+    return pd.to_datetime(timestamp, unit='s') + pd.Timedelta(hours=2)
+
 def get_club_details(club_id):
     #TODO Check the normalization for the json
     """
@@ -78,8 +81,20 @@ def get_club_matches(club_id, match_type = "friendlyMatch"):
     """
     url = f"https://proclubs.ea.com/api/fc/clubs/matches"
     params = {"platform": "common-gen5", "clubIds": club_id, "matchType": match_type, "maxResultCount": 10}
+    matches = request_builder(url, params=params)
+    matches['timestamp'] = timestamp_to_datetime(matches['timestamp']) + pd.Timedelta(hours=2)
+    return matches
 
-    return request_builder(url, params=params)
+def get_club_matches_normalized(club_id, match_type = "friendlyMatch"):
+    """
+    match_type: friendlyMatch, leagueMatch, playoffMatch
+    """
+    url = f"https://proclubs.ea.com/api/fc/clubs/matches"
+    params = {"platform": "common-gen5", "clubIds": club_id, "matchType": match_type, "maxResultCount": 10}
+    matches = request_builder(url, params=params)
+    matches['timestamp'] = timestamp_to_datetime(matches['timestamp']) + pd.Timedelta(hours=2)
+    return normalizer(matches, "clubs")
+
 
 if __name__ == "__main__":
     # Example 1: Get club details by ID
