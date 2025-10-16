@@ -1,6 +1,6 @@
 # FC26 API
 
-This repository contains a Python script (`fc26_api.py`) that allows you to retrieve data from the EA Sports FC 26 Pro Clubs API. With this script, you can get detailed information about any club and search for clubs by their names.
+This repository contains FC6 Clubs API experiement (`fc26_api.py`) that allows you to retrieve data from the EA Sports FC 26 Clubs API. With this script, you can get detailed information about any club and search for clubs by their names.
 
 ## Getting Started
 
