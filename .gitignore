@@ -1,3 +1,4 @@
 archive/*
 __pycache__/fc26_api.cpython-314.pyc
 *.xlsx
+__pycache__/fc26_api_class.cpython-314.pyc
