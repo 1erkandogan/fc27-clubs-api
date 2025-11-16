@@ -134,7 +134,7 @@ class FC26_API:
             return None
 
         try:
-            return self._normalizer(clubs, "clubInfo")
+            return self._normalizer(clubs, "clubInfo").head(1)
         except FC26APIError as exc:
             self._last_error = exc
             return None
