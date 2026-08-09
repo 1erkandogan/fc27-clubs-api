@@ -23,9 +23,10 @@ class FC26_API:
         self.session = session or requests.Session()
         self.timeout = timeout
         self.headers: Dict[str, str] = {
-            "authority": "proclubs.ea.com",
+            "accept": "application/json",
             "accept-language": "en-US,en;q=0.9",
             "sec-ch-ua": '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
+            "sec-fetch-site": "same-origin",
             "user-agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                 "(KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"

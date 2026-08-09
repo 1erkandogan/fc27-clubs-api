@@ -14,9 +14,10 @@ def request_builder(url, params=None):
         A pandas DataFrame containing the response from the API, or None if the request fails.
     """
     headers = {
-        "authority": "proclubs.ea.com",
+        "accept": "application/json",
         "accept-language": "en-US,en;q=0.9",
         "sec-ch-ua": '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
+        "sec-fetch-site": "same-origin",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
     }
 
@@ -39,6 +40,8 @@ def timestamp_to_datetime(timestamp):
     return pd.to_datetime(timestamp, unit='s') + pd.Timedelta(hours=2)
 
 def normalizer(df, prefix):
+    if df is None:
+        return None
     normalized_df = pd.json_normalize(df[prefix])
     normalized_df = normalized_df.add_prefix(prefix)
     final_df = pd.concat([df.drop(columns=[prefix]), normalized_df], axis=1)
@@ -72,8 +75,11 @@ def get_club_details(club_id):
     """
     url = "https://proclubs.ea.com/api/fc/clubs/info"
     params = {"platform": "common-gen5", "clubIds": club_id}
-    # return normalizer(request_builder(url, params=params).T, "customKit")
-    return request_builder(url, params=params).T
+    club = request_builder(url, params=params)
+    if club is None:
+        return None
+    # return normalizer(club.T, "customKit")
+    return club.T
 
 
 
@@ -84,7 +90,9 @@ def get_club_matches(club_id, match_type = "friendlyMatch"):
     url = f"https://proclubs.ea.com/api/fc/clubs/matches"
     params = {"platform": "common-gen5", "clubIds": club_id, "matchType": match_type, "maxResultCount": 10}
     matches = request_builder(url, params=params)
-    matches['timestamp'] = timestamp_to_datetime(matches['timestamp']) + pd.Timedelta(hours=2)
+    if matches is None:
+        return None
+    matches['timestamp'] = timestamp_to_datetime(matches['timestamp'])
     return matches
 
 def get_club_matches_normalized(club_id, match_type = "friendlyMatch"):
@@ -94,7 +102,9 @@ def get_club_matches_normalized(club_id, match_type = "friendlyMatch"):
     url = f"https://proclubs.ea.com/api/fc/clubs/matches"
     params = {"platform": "common-gen5", "clubIds": club_id, "matchType": match_type, "maxResultCount": 10}
     matches = request_builder(url, params=params)
-    matches['timestamp'] = timestamp_to_datetime(matches['timestamp']) + pd.Timedelta(hours=2)
+    if matches is None:
+        return None
+    matches['timestamp'] = timestamp_to_datetime(matches['timestamp'])
     return normalizer(matches, "clubs")
 
 
