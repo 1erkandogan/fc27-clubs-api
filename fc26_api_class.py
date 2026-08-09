@@ -151,6 +151,7 @@ class FC26_API:
         """
         params = {"platform": "common-gen5", "clubIds": club_id}
         club_details = self._handle_api_call("clubs/info", params=params)
+        print(club_details)
         if club_details is None:
             return None
         return club_details.T
@@ -172,7 +173,7 @@ class FC26_API:
             return matches
 
         try:
-            return self._apply_timestamp_column(matches, "timestamp", offset_hours=2)
+            return self._apply_timestamp_column(matches, "timestamp", offset_hours=1)
         except FC26APIError as exc:
             self._last_error = exc
             return None
