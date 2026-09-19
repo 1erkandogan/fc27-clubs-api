@@ -2,3 +2,11 @@ archive/*
 *.xlsx
 *.pyc
 *.ipynb
+.venv/
+__pycache__/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/

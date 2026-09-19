@@ -1,0 +1,34 @@
+{
+  "1001": {
+    "name": "Example FC",
+    "clubId": 1001,
+    "regionId": 1000000,
+    "teamId": 100,
+    "customKit": {
+      "stadName": "Example Stadium",
+      "kitId": "0",
+      "seasonalTeamId": "0",
+      "seasonalKitId": "0",
+      "selectedKitType": "0",
+      "customKitId": "0",
+      "kitColor1": "16777215",
+      "kitColor2": "0",
+      "kitColor3": "0",
+      "kitColor4": "0",
+      "customAwayKitId": "0",
+      "kitAColor1": "16777215",
+      "kitAColor2": "0",
+      "kitAColor3": "0",
+      "kitAColor4": "0",
+      "customThirdKitId": "0",
+      "kitThrdColor1": "16777215",
+      "kitThrdColor2": "0",
+      "kitThrdColor3": "0",
+      "kitThrdColor4": "0",
+      "dCustomKit": "0",
+      "customKeeperKitId": "0",
+      "crestColor": "0",
+      "crestAssetId": "0"
+    }
+  }
+}

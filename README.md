@@ -1,177 +1,148 @@
-# FC 26 Clubs API
+# FC 27 Clubs API
 
-An unofficial, unauthenticated Python client for the **EA Sports FC 26 Pro Clubs API**.
-Search for clubs by name, pull club details, and fetch recent matches — everything comes
-back as a pandas `DataFrame`.
+An unofficial Python client for the **EA Sports FC 27 Pro Clubs API**, the same
+endpoints `proclubs.ea.com` calls from the browser. You can find clubs and get
+their stats, members, matches and per-player match ratings as tables (pandas
+DataFrames).
 
-This is an experiment built for the EA Sports FC 26. It is not affiliated with, endorsed by, or supported by EA. The endpoints it uses are the ones `proclubs.ea.com` calls from the browser and can change or disappear without notice.
+Not affiliated with or endorsed by EA. The endpoints are undocumented and can
+change without notice.
 
-## Requirements
+- **New to Python, or want to know how it works?** Read [docs/how-it-works.md](docs/how-it-works.md).
+  It walks through the code and explains every import and decision.
+- **Want EA's raw responses?** See [docs/endpoints.md](docs/endpoints.md).
 
-* Python 3.9+
-* Dependencies pinned in [`requirements.txt`](requirements.txt)
+## Install
 
-## Installation
+You need Python 3.9 or newer.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/1erkandogan/fc26-clubs-api.git
-   cd fc26-clubs-api
-   ```
-2. (Recommended) Create a virtual environment:
-   ```bash
-   python -m venv .venv
-   # Windows
-   .venv\Scripts\activate
-   # macOS / Linux
-   source .venv/bin/activate
-   ```
-3. Install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+git clone https://github.com/1erkandogan/fc26-clubs-api.git
+cd fc26-clubs-api
+pip install -r requirements.txt   # installs pandas, the only dependency
+```
 
-No API key, token, or `.env` file is needed — the Pro Clubs endpoints are public.
+No API key needed. The whole client is one file, [`fc27_api.py`](fc27_api.py).
+Put your own script **in the same folder** (or copy `fc27_api.py` next to your
+script) so that `from fc27_api import FC27API` can find it.
 
 ## Quick start
 
 ```python
-from fc26_api_class import FC26_API
+from fc27_api import FC27API
 
-api = FC26_API()
+api = FC27API(timezone="Europe/Istanbul")      # match times in your timezone
 
-# Search returns the single best match as a one-row DataFrame
-club = api.search_club_by_name("Real Madrid")
-if club is None:
-    raise SystemExit("search failed")
-if club.empty:
-    raise SystemExit("no club with that name")
+club_id = api.find_club_id("Your Club Name")   # -> the id, e.g. 1001
 
-club_id = club["clubId"].iat[0]   # e.g. 240
-
-details = api.get_club_details(club_id)                       # transposed DataFrame
-matches = api.get_club_matches_normalized(club_id, "leagueMatch")
-
-print(details)
-print(matches.head())
+print(api.get_club_matches(club_id))           # last 10 league matches
+print(api.get_member_stats(club_id))           # squad stats this season
 ```
 
-Both modules also run standalone (`python fc26_api_class.py`), but the `__main__` block is
-a placeholder demo using the fake id `"123456"` and club name `"MyClub"` — replace those
-before expecting output.
+Or run the example: `python examples/quickstart.py "Your Club Name"`
 
-## API reference
+## Methods
 
-### `FC26_API(session=None, timeout=10)`
+| Method | Gives you (one row per ...) |
+|---|---|
+| `find_club_id(name)` | the club's id as a number. If several clubs match, the error lists them. |
+| `search_club_by_name(name)` | club matching the name: division, wins, goals, points |
+| `get_club_details(club_id)` | club (1 row): name, ids, stadium |
+| `get_club_overall_stats(club_id)` | club (1 row): record, goals, streaks, skill rating |
+| `get_member_stats(club_id)` | member: games, goals, assists, average rating, pass/tackle rates |
+| `get_member_career_stats(club_id)` | member: career totals at the club |
+| `get_club_matches(club_id, match_type="leagueMatch", count=10)` | match, from your side: opponent, score, `result` (win/draw/loss), `dnf` |
+| `get_match_players(club_id, match_type="leagueMatch", count=10, both_teams=False)` | player per match: rating, goals, assists, shots, passes, tackles |
+| `get_playoff_achievements(club_id)` | achievement (EA has only returned an empty list so far) |
+| `get_json(endpoint, params)` | EA's raw response as dicts/lists, e.g. `api.get_json("clubs/info", {"clubIds": 1001})` |
 
-| Argument  | Default | Notes |
-|-----------|---------|-------|
-| `session` | `None`  | Pass a `requests.Session` to reuse connections or inject a mock in tests. A new session is created when omitted. |
-| `timeout` | `10`    | Per-request timeout in seconds. |
+- `match_type` is `"leagueMatch"`, `"friendlyMatch"` or `"playoffMatch"`.
+- By default, tables have a short set of readable columns. Add `all_columns=True` to
+  `search_club_by_name`, `get_club_details`, `get_club_overall_stats`,
+  `get_member_stats` or `get_match_players` to get every field EA sends, with EA's names.
+- `FC27API(platform="common-gen5", timeout=10, timezone="UTC")`: all settings are optional.
+- If there is no data, you get an empty table (`df.empty` is `True`).
 
-### Methods
-
-All methods return `Optional[pd.DataFrame]` — a `DataFrame` on success, `None` when the
-request or the post-processing fails. A successful call that simply found nothing returns
-an **empty** `DataFrame`, not `None`, so check both (`if df is None or df.empty`).
-
-| Method | Endpoint | Returns |
-|---|---|---|
-| `search_club_by_name(club_name)` | `allTimeLeaderboard/search` | `clubInfo`-normalized DataFrame, **first row only** |
-| `get_club_details(club_id)` | `clubs/info` | **Transposed** DataFrame (fields as rows) |
-| `get_club_matches(club_id, match_type="friendlyMatch")` | `clubs/matches` | Raw match DataFrame with `timestamp` converted to datetime (+1h) |
-| `get_club_matches_normalized(club_id, match_type="friendlyMatch", gmt=2)` | `clubs/matches` | As above with the nested `clubs` column flattened, `timestamp` shifted by `gmt` hours |
-
-Valid `match_type` values: `friendlyMatch`, `leagueMatch`, `playoffMatch`.
-`maxResultCount` is hard-coded to `10`, so the match calls return at most the 10 most
-recent games.
-
-### Error handling
-
-Internally the client raises `FC26APIError` (network failure, non-2xx status, undecodable
-JSON, a missing expected column). The public methods catch it, store it on
-`self._last_error`, and return `None`, so a normal call site just guards on `None`:
+## Recipes
 
 ```python
-from fc26_api_class import FC26_API, FC26APIError
+from fc27_api import FC27API
 
-api = FC26_API()
-matches = api.get_club_matches(club_id, "leagueMatch")
+api = FC27API(timezone="Europe/Istanbul")
+club_id = api.find_club_id("Your Club Name")
 
-if matches is None:
-    print("request failed:", api._last_error)   # private for now, see Known issues
+# Top 5 scorers this season
+members = api.get_member_stats(club_id)
+print(members.sort_values("goals", ascending=False).head(5)[["name", "goals", "assists"]])
+
+# Last 5 league results
+matches = api.get_club_matches(club_id)
+print(matches.head(5)[["timestamp", "opponentName", "goals", "goalsAgainst", "result"]])
+
+# Win rate over the last 10 league matches
+wins = (matches["result"] == "win").sum()
+print(f"Won {wins} of {len(matches)}")
+
+# One player's recent matches
+players = api.get_match_players(club_id)
+print(players[players["name"] == "YourGamertag"][["timestamp", "rating", "goals", "assists"]])
+
+# Average match rating per player, best first
+print(players.groupby("name")["rating"].mean().sort_values(ascending=False))
+
+# Save any table to open in Excel
+members.to_csv("members.csv", index=False)
+# members.to_excel("members.xlsx", index=False)   # needs: pip install openpyxl
 ```
 
-If you want the exception instead of `None`, call the private `_request_builder` directly
-and catch `FC26APIError` yourself.
+## Errors
 
-## How it talks to EA
-
-Two details matter more than anything else in this repo:
-
-**1. `platform=common-gen5` is sent on every call.** It is hard-coded and not currently
-parameterizable. Requests without it are rejected.
-
-**2. The requests must look like the site's own XHR calls.** EA sits behind Akamai, which
-blocks anything that does not resemble browser traffic from `proclubs.ea.com`. The client
-always sends this header set (`fc26_api_class.py:25-34`):
+- **`FC27APIError`**: EA couldn't be reached, refused the request, or didn't send JSON.
+- **`ValueError`**: you passed something invalid, such as an unknown `match_type`, or a
+  club name that `find_club_id` couldn't match to one club.
 
 ```python
-{
-    "accept": "application/json",
-    "accept-language": "en-US,en;q=0.9",
-    "sec-ch-ua": '"Google Chrome";v="141", "Not?A_Brand";v="8", "Chromium";v="141"',
-    "sec-fetch-site": "same-origin",
-    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                  "(KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
-}
+from fc27_api import FC27API, FC27APIError
+
+try:
+    df = FC27API().get_club_details(1001)
+except FC27APIError as error:
+    print("EA problem:", error)
 ```
 
-`sec-fetch-site: same-origin` together with a realistic `user-agent` / `sec-ch-ua` is what
-gets through. Drop them and the edge returns an error page instead of JSON.
+## Good to know
 
-Base URL: `https://proclubs.ea.com/api/fc`
+- **EA blocks non-browser requests.** Every request sends browser-like headers
+  (`HEADERS` in `fc27_api.py`). Without them EA answers 403 or doesn't answer at all.
+  Plain `curl` is blocked even with the headers, while Python works.
+- **No caching or rate limiting.** Every call goes straight to EA. If you loop over
+  many clubs, add a pause between requests (`time.sleep(1)`) so you don't get blocked.
 
-**No caching, no retries, no backoff, no rate limiting.** Every call goes straight to EA.
-If you loop over many clubs, add your own throttling — it is a free public endpoint and
-hammering it is a good way to get blocked.
+## Changes from the FC 26 version
 
-## Legacy module: `fc26_api.py`
+The EA URLs are unchanged: EA's `/api/fc` path has no game year in it. The code changed:
 
-`fc26_api.py` exposes the same four calls as plain module-level functions
-(`search_club_by_name`, `get_club_details`, `get_club_matches`,
-`get_club_matches_normalized`). Differences from the class client:
+- `fc26_api.py` and `fc26_api_class.py` have become one file, `fc27_api.py` (`FC27API`).
+- Four endpoints are new: member stats, member career stats, overall stats and playoff achievements.
+- `find_club_id` is new. `search_club_by_name` now returns **all** matching clubs,
+  where FC26 kept only the first.
+- `get_club_matches` gives one clean row per match with the result. The old
+  `get_club_matches_normalized` produced sparse `clubs<ID>.*` columns.
+- `get_match_players` is new: per-player ratings and stats for each match.
+- Match times are real dates in your chosen timezone, not a hard-coded +1h/+2h shift.
+- Friendly results are worked out from the score, because EA doesn't fill in win/loss for friendlies.
+- Errors raise `FC27APIError` instead of silently returning `None`.
+- `requests` was replaced with Python's built-in `urllib`, so pandas is the only dependency.
 
-* Errors are printed and `None` is returned; there is no `FC26APIError`.
-* No `requests.Session`, so no connection reuse; the timeout is fixed at 10s.
-* `search_club_by_name` returns **all** matching rows, not just the first.
-* Timestamps are always shifted by +2 hours.
+## Tests
 
-Prefer `fc26_api_class.py` for new work. The functional module is kept because older
-notebooks import it.
+```bash
+python -m unittest discover -s tests -v
+```
 
-## Known issues
-
-* `get_club_details` still contains a stray debug `print()` (`fc26_api_class.py:155`).
-* Timezone handling is inconsistent: `+1h` in `get_club_matches`, `gmt=2` by default in
-  `get_club_matches_normalized`, `+2h` in `fc26_api.py`. All datetimes are tz-naive.
-* `FC26_API.search_club_by_name` silently truncates the result to one row.
-* `_last_error` has no public accessor yet.
-* `platform` and `maxResultCount` cannot be overridden.
-* There are no automated tests.
-* The `Club` / `Matches` dataclasses that briefly existed in git history were removed and
-  are **not** part of the current API.
-
-## Built With
-
-* [Python](https://www.python.org/)
-* [pandas](https://pandas.pydata.org/) — response handling and normalization
-* [requests](https://requests.readthedocs.io/en/latest/) — HTTP
-
-## Contributing
-
-Contributions are welcome. Feel free to open an issue or submit a pull request.
+The tests run offline, using EA responses saved in `tests/fixtures/`. They keep the real structure,
+but every club and player name, id and date is a placeholder.
 
 ## License
 
-MIT — see [LICENSE.md](LICENSE.md).
+MIT, see [LICENSE.md](LICENSE.md).
