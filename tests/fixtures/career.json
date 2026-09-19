@@ -1,0 +1,32 @@
+{
+  "members": [
+    {
+      "name": "Player1",
+      "proPos": "25",
+      "gamesPlayed": "29",
+      "goals": "5",
+      "assists": "3",
+      "manOfTheMatch": "1",
+      "ratingAve": "7.3",
+      "prevGoals": "0",
+      "favoritePosition": "forward"
+    },
+    {
+      "name": "Player2",
+      "proPos": "25",
+      "gamesPlayed": "30",
+      "goals": "27",
+      "assists": "36",
+      "manOfTheMatch": "7",
+      "ratingAve": "8.3",
+      "prevGoals": "0",
+      "favoritePosition": "forward"
+    }
+  ],
+  "positionCount": {
+    "midfielder": 4,
+    "goalkeeper": 1,
+    "forward": 7,
+    "defender": 2
+  }
+}
