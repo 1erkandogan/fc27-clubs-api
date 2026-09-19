@@ -61,7 +61,7 @@ The first four come **with Python**, so you don't need to install anything:
 ### 2.1 Why not `requests`?
 
 Most tutorials use the popular [`requests`](https://requests.readthedocs.io) library,
-and the FC26 version of this project did too. With `requests` the call looks like this:
+and it is a fine choice. With `requests` the call looks like this:
 
 ```python
 response = requests.get(url, params=params, headers=HEADERS, timeout=10)

@@ -17,8 +17,8 @@ change without notice.
 You need Python 3.9 or newer.
 
 ```bash
-git clone https://github.com/1erkandogan/fc26-clubs-api.git
-cd fc26-clubs-api
+git clone https://github.com/1erkandogan/fc27-clubs-api.git
+cd fc27-clubs-api
 pip install -r requirements.txt   # installs pandas, the only dependency
 ```
 
@@ -117,22 +117,6 @@ except FC27APIError as error:
   Plain `curl` is blocked even with the headers, while Python works.
 - **No caching or rate limiting.** Every call goes straight to EA. If you loop over
   many clubs, add a pause between requests (`time.sleep(1)`) so you don't get blocked.
-
-## Changes from the FC 26 version
-
-The EA URLs are unchanged: EA's `/api/fc` path has no game year in it. The code changed:
-
-- `fc26_api.py` and `fc26_api_class.py` have become one file, `fc27_api.py` (`FC27API`).
-- Four endpoints are new: member stats, member career stats, overall stats and playoff achievements.
-- `find_club_id` is new. `search_club_by_name` now returns **all** matching clubs,
-  where FC26 kept only the first.
-- `get_club_matches` gives one clean row per match with the result. The old
-  `get_club_matches_normalized` produced sparse `clubs<ID>.*` columns.
-- `get_match_players` is new: per-player ratings and stats for each match.
-- Match times are real dates in your chosen timezone, not a hard-coded +1h/+2h shift.
-- Friendly results are worked out from the score, because EA doesn't fill in win/loss for friendlies.
-- Errors raise `FC27APIError` instead of silently returning `None`.
-- `requests` was replaced with Python's built-in `urllib`, so pandas is the only dependency.
 
 ## Tests
 
