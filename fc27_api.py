@@ -300,20 +300,21 @@ class FC27API:
 
             # League matches say who won in wins/ties/losses. Friendlies leave
             # those at "0", so there we compare the goals instead.
-            if us.get("wins") == "1":
-                result = "win"
-            elif us.get("losses") == "1":
-                result = "loss"
-            elif us.get("ties") == "1":
-                result = "draw"
-            elif goals > goals_against:
-                result = "win"
-            elif goals < goals_against:
-                result = "loss"
-            else:
-                result = "draw"
+            match (us.get("wins"), us.get("losses"), us.get("ties")):
+                case ("1", _, _):
+                    result = "win"
+                case (_, "1", _):
+                    result = "loss"
+                case (_, _, "1"):
+                    result = "draw"
+                case _ if goals > goals_against:
+                    result = "win"
+                case _ if goals < goals_against:
+                    result = "loss"
+                case _:
+                    result = "draw"
 
-            rows.append({
+        rows.append({
                 "matchId": match.get("matchId"),
                 "timestamp": match.get("timestamp"),
                 "matchType": match_type,
