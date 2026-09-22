@@ -314,7 +314,7 @@ class FC27API:
                 case _:
                     result = "draw"
 
-        rows.append({
+            rows.append({
                 "matchId": match.get("matchId"),
                 "timestamp": match.get("timestamp"),
                 "matchType": match_type,
