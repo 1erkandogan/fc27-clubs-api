@@ -127,6 +127,13 @@ python -m unittest discover -s tests -v
 The tests run offline, using EA responses saved in `tests/fixtures/`. They keep the real structure,
 but every club and player name, id and date is a placeholder.
 
+## Contributing
+
+Bug reports are welcome, especially when EA changes something and the client
+breaks. Please open an issue before writing code: the project is deliberately
+small and some things that look like oversights are decisions. See
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 MIT, see [LICENSE.md](LICENSE.md).
