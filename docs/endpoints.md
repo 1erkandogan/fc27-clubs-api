@@ -1,8 +1,12 @@
 # Endpoint reference
 
+This page documents EA's **raw** responses, which is what you get with
+`output="raw"` or `api.get_json(...)`. For the cleaned formats see
+[Output formats](output-formats.md).
+
 All endpoints are `GET https://proclubs.ea.com/api/fc/<endpoint>` and need
-`platform=common-gen5` plus the browser-style headers in `fc_clubs_api.py`
-(`HEADERS`). Without them EA's edge (Akamai) answers **403** or never answers
+`platform=common-gen5` plus the browser-style headers in
+[`fc_clubs_api.HEADERS`](https://github.com/1erkandogan/fc27-clubs-api/blob/main/src/fc_clubs_api/_http.py). Without them EA's edge (Akamai) answers **403** or never answers
 (the request hangs until it times out). Plain `curl` is blocked even with the
 headers, while Python (`urllib` or `requests`) gets through.
 
@@ -10,19 +14,22 @@ Observed on **2026-09-19** against a real club, and re-checked on **2026-10-02**
 against another (every endpoint and field below still matched). The structure is real, but all names,
 ids, dates, kit values and club totals below are **placeholders** ("Example FC" = `1001`,
 "Opponent A" = `2001`, "Player1", ...). The same anonymized responses are in
-[`tests/fixtures/`](../tests/fixtures/).
+[`tests/fixtures/`](https://github.com/1erkandogan/fc27-clubs-api/tree/main/tests/fixtures).
+Community findings from the [EA FC Pro Clubs API research](https://github.com/Interactive-63/eafc-pro-clubs-api-research)
+project are credited where they are used.
 
 General quirks:
 
 - Almost every value is a **string**, including numbers (`"25"`, `"7.4"`). The
-  client converts numeric columns for you.
+  `records` and `dataframe` formats convert numeric fields for you.
 - Some parameters are singular (`clubId`) and some plural (`clubIds`). Only single
   ids have been tested.
 - Empty results are `[]`. JSON `null` has also been reported for matches.
 
 | Endpoint | Club parameter | Python method |
 |---|---|---|
-| [`allTimeLeaderboard/search`](#alltimeleaderboardsearch) | `clubName` | `search_club_by_name` |
+| [`allTimeLeaderboard/search`](#alltimeleaderboardsearch) | `clubName` | `search_club_by_name`, `find_club_id` |
+| [`currentSeasonLeaderboard/search`](#currentseasonleaderboardsearch) | `clubName` | `search_club_by_name(scope="current_season")` |
 | [`clubs/info`](#clubsinfo) | `clubIds` | `get_club_details` |
 | [`clubs/overallStats`](#clubsoverallstats) | `clubIds` | `get_club_overall_stats` |
 | [`members/stats`](#membersstats) | `clubId` | `get_member_stats` |
@@ -36,8 +43,9 @@ General quirks:
 
 `?platform=common-gen5&clubName=example`
 
-Returns a **list** of every club whose name contains the text. Each item has all-time
-league totals plus a nested `clubInfo`, which is the same object `clubs/info` returns.
+Returns a **list** of clubs whose name contains the text (case-insensitive). Each item
+has all-time league totals plus a nested `clubInfo`, which is the same object
+`clubs/info` returns.
 
 ```json
 [
@@ -58,6 +66,29 @@ league totals plus a nested `clubInfo`, which is the same object `clubs/info` re
   }
 ]
 ```
+
+- `reputationtier` is `0`–`3`; EA serves an icon per tier (see [Images and crests](assets.md)).
+- `currentDivision` / `bestDivision` are `1` (top) to `6`.
+
+**`maxResultCount`** (optional) is *not* an exact limit. Checked on 2026-10-02 with
+two search terms on both leaderboards, asking for N returned:
+
+| `maxResultCount` | 1 | 2 | 3 | 5 | 10 | 50 | omitted |
+|---|---|---|---|---|---|---|---|
+| clubs returned | 0 | 1 | 1 | 2 | 3–4 | 11–18 | same as 10 |
+
+EA seems to fetch N leaderboard rows and then filter them, so treat it as "search
+deeper" rather than "return at most N". `search_club_by_name(max_result_count=...)`
+passes it through unchanged.
+
+## currentSeasonLeaderboard/search
+
+`?platform=common-gen5&clubName=example`
+
+Same parameters and **exactly the same shape** as `allTimeLeaderboard/search` (checked
+field by field on 2026-10-02), but the totals cover the running season only. Early in
+FC 27 the two return identical numbers, because only one season has been played.
+Fixture: [`search_current_season.json`](https://github.com/1erkandogan/fc27-clubs-api/blob/main/tests/fixtures/search_current_season.json).
 
 ## clubs/info
 
@@ -88,7 +119,11 @@ Returns a **dict keyed by club id (string)**.
 }
 ```
 
-Kit colours are decimal RGB: `16777215` = `0xFFFFFF` (white), so `f"#{int(c):06x}"`.
+- Kit and crest colours are decimal RGB: `16777215` = `0xFFFFFF` (white).
+  `fc_clubs_api.assets.kit_color_hex("16777215")` returns `"#ffffff"`.
+- `teamId` is the real-world badge id, `crestAssetId` the custom crest id. Which one
+  the club displays: see [Images and crests](assets.md#club-crests). In every club checked,
+  `selectedKitType` `"1"` went with a custom crest and `"0"` with a real badge.
 
 ## clubs/overallStats
 
@@ -250,10 +285,22 @@ out returns 5. There is no paging parameter, so older matches can't be fetched.
 - **Friendlies** set `wins`/`ties`/`losses`/`result` to `"0"` for both clubs, so
   work out the result from `goals` vs `goalsAgainst`. `get_club_matches` does this.
 - `clubs[id].matchType` was `"1"` for league matches and `"5"` for friendlies.
-- `match_event_aggregate_*` are `eventId:count` lists. The event ids are undocumented.
+- `TEAM` is the crest id the club played with: its `teamId` (real badge) or its
+  `customKit.crestAssetId` (custom crest). The `records`/`dataframe` output turns it
+  into `crestUrl` / `opponentCrestUrl`.
+- `match_event_aggregate_*` are `eventId:count` lists (`"215:21,216:5"`). EA does not
+  document the ids; [Match events](match-events.md) lists what the community has
+  decoded, and `get_match_players(include_events=True)` adds them as named columns.
+- Named fields and events don't always agree. `passesmade` **includes** offside passes
+  (`event_215` + `event_153`), while `event_215` excludes them.
 
 ## club/playoffAchievements
 
 `?platform=common-gen5&clubId=1001`
 
 Returned `[]`. The shape of a populated item is unknown.
+
+## Image endpoints
+
+Crests, division badges and reputation icons are plain PNGs on EA's CDN, outside this
+API. See [Images and crests](assets.md).

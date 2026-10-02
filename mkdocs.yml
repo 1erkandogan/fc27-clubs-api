@@ -1,0 +1,83 @@
+site_name: fc-clubs-api
+site_description: Unofficial Python client for the EA Sports FC 27 Pro Clubs API
+site_url: https://1erkandogan.github.io/fc27-clubs-api/
+repo_url: https://github.com/1erkandogan/fc27-clubs-api
+repo_name: 1erkandogan/fc27-clubs-api
+edit_uri: edit/main/docs/
+copyright: MIT licensed. Not affiliated with or endorsed by EA.
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - content.tabs.link
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Output formats: output-formats.md
+  - Recipes: recipes.md
+  - API reference: reference.md
+  - EA's API:
+      - Endpoints: endpoints.md
+      - Match events: match-events.md
+      - Images and crests: assets.md
+  - Errors: errors.md
+  - Architecture: architecture.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            separate_signature: true
+            members_order: source
+            filters: ["!^_"]
+            merge_init_into_class: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets:
+      check_paths: true

@@ -4,23 +4,76 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fc-clubs-api"
-version = "0.1.1"
-description = "Unofficial Python client for the EA Sports FC 27 Pro Clubs API, returning pandas DataFrames."
+dynamic = ["version"]
+description = "Unofficial Python client for the EA Sports FC 27 Pro Clubs API: raw JSON, clean records or pandas DataFrames."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 license-files = ["LICENSE.md"]
 authors = [{ name = "Erkan Dogan" }]
-dependencies = ["pandas>=1.5"]
-keywords = ["ea", "fc27", "pro clubs", "api", "pandas"]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
+dependencies = [
+    # Windows ships no timezone database; zoneinfo needs this there.
+    'tzdata; sys_platform == "win32"',
 ]
+keywords = ["ea", "ea sports fc", "fc27", "pro clubs", "clubs", "api", "client", "pandas"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Games/Entertainment",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+dev = ["pandas>=2.0", "pytest>=7", "ruff>=0.6", "build", "twine"]
+docs = ["mkdocs>=1.6,<2", "mkdocs-material>=9.5", "mkdocstrings[python]>=0.26"]
+
+[project.scripts]
+fc-clubs = "fc_clubs_api.__main__:main"
 
 [project.urls]
 Homepage = "https://github.com/1erkandogan/fc27-clubs-api"
+Documentation = "https://1erkandogan.github.io/fc27-clubs-api/"
+Changelog = "https://github.com/1erkandogan/fc27-clubs-api/blob/main/CHANGELOG.md"
 Issues = "https://github.com/1erkandogan/fc27-clubs-api/issues"
 
-[tool.setuptools]
-py-modules = ["fc_clubs_api"]
+[tool.setuptools.dynamic]
+version = { attr = "fc_clubs_api._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fc_clubs_api = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+extend-exclude = ["*.md"]  # docs keep hand-aligned code comments
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = [
+    "UP006", "UP007", "UP035", "UP045",  # keep typing.List/Optional: readable on 3.9
+    "RUF022",                            # __all__ is grouped by kind, not sorted
+    "SIM108",                            # if/else blocks are often clearer than ternaries
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B"]

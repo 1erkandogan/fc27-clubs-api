@@ -1,144 +1,157 @@
-# FC 27 Clubs API
+# fc-clubs-api
+
+[![PyPI](https://img.shields.io/pypi/v/fc-clubs-api)](https://pypi.org/project/fc-clubs-api/)
+[![Python](https://img.shields.io/pypi/pyversions/fc-clubs-api)](https://pypi.org/project/fc-clubs-api/)
+[![CI](https://github.com/1erkandogan/fc27-clubs-api/actions/workflows/ci.yml/badge.svg)](https://github.com/1erkandogan/fc27-clubs-api/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-online-blue)](https://1erkandogan.github.io/fc27-clubs-api/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/1erkandogan/fc27-clubs-api/blob/main/LICENSE.md)
 
 An unofficial Python client for the **EA Sports FC 27 Pro Clubs API**, the same
-endpoints `proclubs.ea.com` calls from the browser. You can find clubs and get
-their stats, members, matches and per-player match ratings as tables (pandas
-DataFrames).
+endpoints [proclubs.ea.com](https://proclubs.ea.com) calls from the browser. Find
+clubs and get their stats, members, match history and per-player match ratings as
+EA's raw JSON, clean Python records or pandas DataFrames.
 
-Not affiliated with or endorsed by EA. The endpoints are undocumented and can
-change without notice.
+```python
+from fc_clubs_api import FC27API
 
-- **New to Python, or want to know how it works?** Read [docs/how-it-works.md](https://github.com/1erkandogan/fc27-clubs-api/blob/main/docs/how-it-works.md).
-  It walks through the code and explains every import and decision.
-- **Want EA's raw responses?** See [docs/endpoints.md](https://github.com/1erkandogan/fc27-clubs-api/blob/main/docs/endpoints.md).
+api = FC27API()
+club_id = api.find_club_id("Your Club Name")
+api.get_club_matches(club_id)    # last 10 league matches
+```
+
+**[Documentation](https://1erkandogan.github.io/fc27-clubs-api/)** ·
+[Getting started](https://1erkandogan.github.io/fc27-clubs-api/getting-started/) ·
+[API reference](https://1erkandogan.github.io/fc27-clubs-api/reference/) ·
+[EA endpoints](https://1erkandogan.github.io/fc27-clubs-api/endpoints/) ·
+[Changelog](https://github.com/1erkandogan/fc27-clubs-api/blob/main/CHANGELOG.md)
+
+## Features
+
+- **Three output formats**: `raw` JSON, typed `records`, or a pandas `dataframe`,
+  set per client or per call.
+- **No required dependencies.** The core is standard library only; pandas is an extra.
+- **Every known club endpoint**: search (all-time and current season), details,
+  overall stats, member and career stats, matches, per-player match stats.
+- **Matches from your side**: opponent, score, `result` (win/draw/loss) and `dnf`,
+  correct for league matches *and* friendlies.
+- **80+ decoded match events** EA doesn't name: pass direction and length,
+  possession won by pitch third, positioning, in-game feedback.
+- **Crest, division and reputation images**, with the crest fallback rule.
+- Timezone-aware timestamps, consistent camelCase columns, fully typed,
+  a `fc-clubs` CLI.
 
 ## Install
 
-You need Python 3.9 or newer.
+Python 3.9 or newer.
 
 ```bash
-pip install fc-clubs-api   # also installs pandas, the only dependency
+pip install "fc-clubs-api[pandas]"   # with DataFrame output (analysis, notebooks)
+pip install fc-clubs-api             # no dependencies (apps, bots, APIs)
 ```
 
-No API key needed. The whole client is one file, [`fc_clubs_api.py`](https://github.com/1erkandogan/fc27-clubs-api/blob/main/fc_clubs_api.py),
-and you import it as `fc_clubs_api`.
+No API key needed; the data is public.
 
-To work on the code itself, install from a clone instead:
+## Output formats
 
-```bash
-git clone https://github.com/1erkandogan/fc27-clubs-api.git
-cd fc27-clubs-api
-pip install -e .   # your edits to fc_clubs_api.py take effect without reinstalling
-```
+The same data, three ways. `dataframe` is the default.
 
-## Quick start
+| Format | Returns | For |
+|---|---|---|
+| `"raw"` | EA's JSON exactly as received | storage, proxies, fields not mapped here |
+| `"records"` | `list[dict]`: flat, typed, renamed, timestamps as `datetime` | backends, bots, JSON APIs |
+| `"dataframe"` | `pandas.DataFrame` with the same columns as `records` | analysis, CSV/Excel |
 
 ```python
 from fc_clubs_api import FC27API
 
-api = FC27API(timezone="Europe/Istanbul")      # match times in your timezone
+api = FC27API(output="records", timezone="Europe/London")   # client default
 
-club_id = api.find_club_id("Your Club Name")   # -> the id, e.g. 1001
-
-print(api.get_club_matches(club_id))           # last 10 league matches
-print(api.get_member_stats(club_id))           # squad stats this season
+api.get_member_stats(1001)                       # list of dicts
+api.get_member_stats(1001, output="raw")         # {"members": [...], "positionCount": {...}}
+api.get_member_stats(1001, output="dataframe")   # DataFrame
 ```
 
-Or run the example: `python examples/quickstart.py "Your Club Name"`
+[More on output formats →](https://1erkandogan.github.io/fc27-clubs-api/output-formats/)
 
 ## Methods
 
-| Method | Gives you (one row per ...) |
+| Method | One row per |
 |---|---|
-| `find_club_id(name)` | the club's id as a number. If several clubs match, the error lists them. |
-| `search_club_by_name(name)` | club matching the name: division, wins, goals, points |
-| `get_club_details(club_id)` | club (1 row): name, ids, stadium |
-| `get_club_overall_stats(club_id)` | club (1 row): record, goals, streaks, skill rating |
-| `get_member_stats(club_id)` | member: games, goals, assists, average rating, pass/tackle rates |
+| `find_club_id(name)` | returns the club id (`int`) |
+| `search_club_by_name(name, scope="all_time")` | matching club; `scope="current_season"` for this season |
+| `get_club_details(club_id)` | club: name, ids, stadium, crest |
+| `get_club_overall_stats(club_id)` | club: record, goals, streaks, skill rating |
+| `get_member_stats(club_id)` | member: this season's games, goals, assists, rating, pass/tackle rates |
 | `get_member_career_stats(club_id)` | member: career totals at the club |
-| `get_club_matches(club_id, match_type="leagueMatch", count=10)` | match, from your side: opponent, score, `result` (win/draw/loss), `dnf` |
-| `get_match_players(club_id, match_type="leagueMatch", count=10, both_teams=False)` | player per match: rating, goals, assists, shots, passes, tackles |
-| `get_playoff_achievements(club_id)` | achievement (EA has only returned an empty list so far) |
-| `get_json(endpoint, params)` | EA's raw response as dicts/lists, e.g. `api.get_json("clubs/info", {"clubIds": 1001})` |
+| `get_club_matches(club_id, match_type, count)` | match: opponent, score, `result`, `dnf` |
+| `get_match_players(club_id, match_type, count)` | player per match: rating, goals, passes, tackles, ... |
+| `get_playoff_achievements(club_id)` | achievement (EA has only returned `[]` so far) |
+| `get_json(endpoint, params)` | any endpoint, raw |
 
-- `match_type` is `"leagueMatch"`, `"friendlyMatch"` or `"playoffMatch"`.
-- `count` can't go above 10: EA never sends more than the last 10 matches.
-- By default, tables have a short set of readable columns. Add `all_columns=True` to
-  `search_club_by_name`, `get_club_details`, `get_club_overall_stats`,
-  `get_member_stats` or `get_match_players` to get every field EA sends, with EA's names.
-- `FC27API(platform="common-gen5", timeout=10, timezone="UTC")`: all settings are optional.
-- If there is no data, you get an empty table (`df.empty` is `True`).
+- Every data method takes `output=`. Most take `all_columns=True` for every field EA
+  sends, with EA's names.
+- `match_type`: `"leagueMatch"` (default), `"friendlyMatch"`, `"playoffMatch"`, or
+  `MatchType.LEAGUE` etc. `count` is capped at 10 by EA, with no paging.
+- `get_match_players(..., both_teams=True, include_events=True)` adds the opponents
+  and the decoded event stats.
 
-## Recipes
+## Examples
 
 ```python
 from fc_clubs_api import FC27API
 
-api = FC27API(timezone="Europe/Istanbul")
+api = FC27API(timezone="Europe/London")
 club_id = api.find_club_id("Your Club Name")
 
 # Top 5 scorers this season
 members = api.get_member_stats(club_id)
-print(members.sort_values("goals", ascending=False).head(5)[["name", "goals", "assists"]])
-
-# Last 5 league results
-matches = api.get_club_matches(club_id)
-print(matches.head(5)[["timestamp", "opponentName", "goals", "goalsAgainst", "result"]])
-
-# Win rate over the last 10 league matches
-wins = (matches["result"] == "win").sum()
-print(f"Won {wins} of {len(matches)}")
-
-# One player's recent matches
-players = api.get_match_players(club_id)
-print(players[players["name"] == "YourGamertag"][["timestamp", "rating", "goals", "assists"]])
+members.sort_values("goals", ascending=False).head(5)[["name", "goals", "assists"]]
 
 # Average match rating per player, best first
-print(players.groupby("name")["rating"].mean().sort_values(ascending=False))
+players = api.get_match_players(club_id)
+players.groupby("name")["rating"].mean().sort_values(ascending=False)
 
-# Save any table to open in Excel
-members.to_csv("members.csv", index=False)
-# members.to_excel("members.xlsx", index=False)   # needs: pip install openpyxl
+# Where does each player win the ball back? (decoded match events)
+events = api.get_match_players(club_id, include_events=True)
+events.groupby("name")[["possessionWonDefensiveThird", "possessionWonMiddleThird",
+                        "possessionWonAttackingThird"]].sum()
+```
+
+More in the [recipes](https://1erkandogan.github.io/fc27-clubs-api/recipes/) and
+[`examples/`](https://github.com/1erkandogan/fc27-clubs-api/tree/main/examples).
+From the terminal:
+
+```bash
+fc-clubs "Your Club Name"            # recent matches and squad, or --json
 ```
 
 ## Errors
 
-- **`FC27APIError`**: EA couldn't be reached, refused the request, or didn't send JSON.
-- **`ValueError`**: you passed something invalid, such as an unknown `match_type`, or a
-  club name that `find_club_id` couldn't match to one club.
-
-```python
-from fc_clubs_api import FC27API, FC27APIError
-
-try:
-    df = FC27API().get_club_details(1001)
-except FC27APIError as error:
-    print("EA problem:", error)
-```
+All network and response problems raise `FC27APIError` (subclasses
+`FC27HTTPError` with `.status_code`, `FC27ConnectionError`, `FC27ResponseError`).
+`find_club_id` raises `ClubNotFoundError` or `AmbiguousClubError` (with
+`.candidates`), both `ValueError`s. [Details →](https://1erkandogan.github.io/fc27-clubs-api/errors/)
 
 ## Good to know
 
 - **EA blocks non-browser requests.** Every request sends browser-like headers
-  (`HEADERS` in `fc_clubs_api.py`). Without them EA answers 403 or doesn't answer at all.
-  Plain `curl` is blocked even with the headers, while Python works.
-- **No caching or rate limiting.** Every call goes straight to EA. If you loop over
-  many clubs, add a pause between requests (`time.sleep(1)`) so you don't get blocked.
-
-## Tests
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-The tests run offline, using EA responses saved in `tests/fixtures/`. They keep the real structure,
-but every club and player name, id and date is a placeholder.
+  (`fc_clubs_api.HEADERS`); without them EA answers 403 or not at all.
+- **No caching or rate limiting.** Every call goes straight to EA. Pause between
+  requests (`time.sleep(1)`) when looping over many clubs.
+- **Unofficial.** Not affiliated with or endorsed by EA. The endpoints are
+  undocumented and can change without notice.
 
 ## Contributing
 
-Bug reports are welcome, especially when EA changes something and the client
-breaks. Please open an issue before writing code: the project is deliberately
-small and some things that look like oversights are decisions. See
+Bug reports are especially welcome when EA changes something and the client breaks.
+Please open an issue before writing code. See
 [CONTRIBUTING.md](https://github.com/1erkandogan/fc27-clubs-api/blob/main/CONTRIBUTING.md).
+
+## Acknowledgements
+
+The current-season endpoint, crest rules and match event mappings build on the
+community [EA FC Pro Clubs API research](https://github.com/Interactive-63/eafc-pro-clubs-api-research)
+project.
 
 ## License
 

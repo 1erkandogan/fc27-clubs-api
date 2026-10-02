@@ -1,0 +1,40 @@
+name: Bug report
+description: Something returns wrong data, crashes, or EA changed something.
+labels: [bug]
+body:
+  - type: textarea
+    id: call
+    attributes:
+      label: What you called
+      description: The code, with arguments. Club ids are public, so a real one is fine.
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: The full traceback, or the output that came back wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: raw
+    attributes:
+      label: Raw response (optional)
+      description: >
+        If EA's data looks odd, paste the relevant part of `output="raw"` or
+        `api.get_json(...)`. Remove gamertags you don't want public.
+      render: json
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: "fc_clubs_api 0.2.0, Python 3.12, Windows 11"
+    validations:
+      required: true

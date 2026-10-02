@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Match event IDs and stat formulas
+    url: https://github.com/Interactive-63/eafc-pro-clubs-api-research
+    about: New or corrected event mappings belong in the community research project.
