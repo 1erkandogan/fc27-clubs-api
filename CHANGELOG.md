@@ -5,7 +5,7 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/). While the version is 0.x, minor
 releases may contain breaking changes; they are always listed under **Changed**.
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-10-03
 
 The client is now a proper package with three output formats, decoded match events
 and full documentation.
