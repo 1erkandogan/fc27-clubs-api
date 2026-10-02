@@ -62,6 +62,7 @@ Or run the example: `python examples/quickstart.py "Your Club Name"`
 | `get_json(endpoint, params)` | EA's raw response as dicts/lists, e.g. `api.get_json("clubs/info", {"clubIds": 1001})` |
 
 - `match_type` is `"leagueMatch"`, `"friendlyMatch"` or `"playoffMatch"`.
+- `count` can't go above 10: EA never sends more than the last 10 matches.
 - By default, tables have a short set of readable columns. Add `all_columns=True` to
   `search_club_by_name`, `get_club_details`, `get_club_overall_stats`,
   `get_member_stats` or `get_match_players` to get every field EA sends, with EA's names.

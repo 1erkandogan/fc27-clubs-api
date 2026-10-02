@@ -279,7 +279,7 @@ class FC27API:
         """One row per match, seen from `club_id`'s side, newest first.
 
         match_type: "leagueMatch", "friendlyMatch" or "playoffMatch".
-        count:      how many recent matches to ask EA for.
+        count:      how many recent matches to ask EA for. EA sends at most 10.
         """
         # EA uses the club id as a text key ("1001"), so compare as text.
         club_id = str(club_id)

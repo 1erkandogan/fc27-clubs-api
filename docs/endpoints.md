@@ -6,7 +6,8 @@ All endpoints are `GET https://proclubs.ea.com/api/fc/<endpoint>` and need
 (the request hangs until it times out). Plain `curl` is blocked even with the
 headers, while Python (`urllib` or `requests`) gets through.
 
-Observed on **2026-09-19** against a real club. The structure is real, but all names,
+Observed on **2026-09-19** against a real club, and re-checked on **2026-10-02**
+against another (every endpoint and field below still matched). The structure is real, but all names,
 ids, dates, kit values and club totals below are **placeholders** ("Example FC" = `1001`,
 "Opponent A" = `2001`, "Player1", ...). The same anonymized responses are in
 [`tests/fixtures/`](../tests/fixtures/).
@@ -119,7 +120,11 @@ Returns a **list with one item**.
 
 - `bestDivision` / `bestFinishGroup` can be `null`.
 - `lastOpponent0`–`9` are the club ids of the last 10 opponents, newest first.
-  `lastMatch0`–`9` held `1` or `-1`; what `-1` means is unconfirmed.
+- `lastMatch0`–`9` is the result against that opponent: `1` = win, `2` = loss,
+  `3` = draw (checked against `clubs/matches`). Older entries can be `-1`; what that
+  means is unconfirmed.
+- These lists don't always line up with `clubs/matches`: in one check a league
+  match was missing from them. Use `clubs/matches` for match history.
 
 ## members/stats
 
@@ -151,8 +156,11 @@ Current-season stats. Returns `{members: [...], positionCount: {...}}`.
 
 - `name` is the platform gamertag. `proName` is the in-game player name and can be `""`.
 - `proPos`, `proStyle` and `proNationality` are numeric EA ids. No lookup table has been published.
-- `positionCount` counts `favoritePosition`. The client drops it; use
-  `df["favoritePosition"].value_counts()` instead.
+- Members who haven't played this season (`gamesPlayed` `"0"`) are still listed, but
+  `favoritePosition`, `proName`, `proPos`, `proStyle`, `proHeight`, `proNationality`
+  and `proOverallStr` are `""` for them.
+- `positionCount` counts `favoritePosition`, leaving out those `""` members. The client
+  drops it; use `df["favoritePosition"].value_counts()` instead (it counts `""` too).
 
 ## members/career/stats
 
@@ -175,12 +183,17 @@ Career totals at this club. The wrapper is the same as `members/stats`, with few
 }
 ```
 
+As in `members/stats`, `proPos` and `favoritePosition` are `""` for members with no games.
+
 ## clubs/matches
 
 `?platform=common-gen5&clubIds=1001&matchType=leagueMatch&maxResultCount=10`
 
 `matchType` is `leagueMatch`, `friendlyMatch` or `playoffMatch`. Returns a **list of
 matches**, newest first. `playoffMatch` returned `[]`.
+
+`maxResultCount` is capped at **10**: asking for more still returns 10. Leaving it
+out returns 5. There is no paging parameter, so older matches can't be fetched.
 
 ```json
 [
