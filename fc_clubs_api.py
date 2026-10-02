@@ -16,7 +16,7 @@ import urllib.request   # sends the request to EA
 import pandas as pd
 
 
-__version__ = "0.1.0"   # keep in sync with "version" in pyproject.toml
+__version__ = "0.1.1"   # keep in sync with "version" in pyproject.toml
 
 BASE_URL = "https://proclubs.ea.com/api/fc"
 

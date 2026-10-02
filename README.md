@@ -8,9 +8,9 @@ DataFrames).
 Not affiliated with or endorsed by EA. The endpoints are undocumented and can
 change without notice.
 
-- **New to Python, or want to know how it works?** Read [docs/how-it-works.md](docs/how-it-works.md).
+- **New to Python, or want to know how it works?** Read [docs/how-it-works.md](https://github.com/1erkandogan/fc27-clubs-api/blob/main/docs/how-it-works.md).
   It walks through the code and explains every import and decision.
-- **Want EA's raw responses?** See [docs/endpoints.md](docs/endpoints.md).
+- **Want EA's raw responses?** See [docs/endpoints.md](https://github.com/1erkandogan/fc27-clubs-api/blob/main/docs/endpoints.md).
 
 ## Install
 
@@ -20,7 +20,7 @@ You need Python 3.9 or newer.
 pip install fc-clubs-api   # also installs pandas, the only dependency
 ```
 
-No API key needed. The whole client is one file, [`fc_clubs_api.py`](fc_clubs_api.py),
+No API key needed. The whole client is one file, [`fc_clubs_api.py`](https://github.com/1erkandogan/fc27-clubs-api/blob/main/fc_clubs_api.py),
 and you import it as `fc_clubs_api`.
 
 To work on the code itself, install from a clone instead:
@@ -137,8 +137,8 @@ but every club and player name, id and date is a placeholder.
 Bug reports are welcome, especially when EA changes something and the client
 breaks. Please open an issue before writing code: the project is deliberately
 small and some things that look like oversights are decisions. See
-[CONTRIBUTING.md](CONTRIBUTING.md).
+[CONTRIBUTING.md](https://github.com/1erkandogan/fc27-clubs-api/blob/main/CONTRIBUTING.md).
 
 ## License
 
-MIT, see [LICENSE.md](LICENSE.md).
+MIT, see [LICENSE.md](https://github.com/1erkandogan/fc27-clubs-api/blob/main/LICENSE.md).
