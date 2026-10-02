@@ -6,13 +6,13 @@ Run from the repo root:  python examples/quickstart.py "Your Club Name"
 import sys
 from pathlib import Path
 
-# This script lives in examples/, but fc27_api.py is one folder up. Adding that
+# This script lives in examples/, but fc_clubs_api.py is one folder up. Adding that
 # folder to sys.path (the list of places Python looks for imports) lets
-# `from fc27_api import ...` find it. Your own scripts don't need this if
-# they sit next to fc27_api.py.
+# `from fc_clubs_api import ...` find it even without installing. Your own
+# scripts don't need this if you ran `pip install fc-clubs-api`.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from fc27_api import FC27API  # noqa: E402  (import after the sys.path line)
+from fc_clubs_api import FC27API  # noqa: E402  (import after the sys.path line)
 
 # The club name comes from the command line; if it's missing, ask for it.
 if len(sys.argv) > 1:

@@ -17,19 +17,24 @@ change without notice.
 You need Python 3.9 or newer.
 
 ```bash
-git clone https://github.com/1erkandogan/fc27-clubs-api.git
-cd fc27-clubs-api
-pip install -r requirements.txt   # installs pandas, the only dependency
+pip install fc-clubs-api   # also installs pandas, the only dependency
 ```
 
-No API key needed. The whole client is one file, [`fc27_api.py`](fc27_api.py).
-Put your own script **in the same folder** (or copy `fc27_api.py` next to your
-script) so that `from fc27_api import FC27API` can find it.
+No API key needed. The whole client is one file, [`fc_clubs_api.py`](fc_clubs_api.py),
+and you import it as `fc_clubs_api`.
+
+To work on the code itself, install from a clone instead:
+
+```bash
+git clone https://github.com/1erkandogan/fc27-clubs-api.git
+cd fc27-clubs-api
+pip install -e .   # your edits to fc_clubs_api.py take effect without reinstalling
+```
 
 ## Quick start
 
 ```python
-from fc27_api import FC27API
+from fc_clubs_api import FC27API
 
 api = FC27API(timezone="Europe/Istanbul")      # match times in your timezone
 
@@ -66,7 +71,7 @@ Or run the example: `python examples/quickstart.py "Your Club Name"`
 ## Recipes
 
 ```python
-from fc27_api import FC27API
+from fc_clubs_api import FC27API
 
 api = FC27API(timezone="Europe/Istanbul")
 club_id = api.find_club_id("Your Club Name")
@@ -102,7 +107,7 @@ members.to_csv("members.csv", index=False)
   club name that `find_club_id` couldn't match to one club.
 
 ```python
-from fc27_api import FC27API, FC27APIError
+from fc_clubs_api import FC27API, FC27APIError
 
 try:
     df = FC27API().get_club_details(1001)
@@ -113,7 +118,7 @@ except FC27APIError as error:
 ## Good to know
 
 - **EA blocks non-browser requests.** Every request sends browser-like headers
-  (`HEADERS` in `fc27_api.py`). Without them EA answers 403 or doesn't answer at all.
+  (`HEADERS` in `fc_clubs_api.py`). Without them EA answers 403 or doesn't answer at all.
   Plain `curl` is blocked even with the headers, while Python works.
 - **No caching or rate limiting.** Every call goes straight to EA. If you loop over
   many clubs, add a pause between requests (`time.sleep(1)`) so you don't get blocked.

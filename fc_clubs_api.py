@@ -16,6 +16,8 @@ import urllib.request   # sends the request to EA
 import pandas as pd
 
 
+__version__ = "0.1.0"   # keep in sync with "version" in pyproject.toml
+
 BASE_URL = "https://proclubs.ea.com/api/fc"
 
 MATCH_TYPES = ("leagueMatch", "friendlyMatch", "playoffMatch")
@@ -359,8 +361,8 @@ class FC27API:
         return pick_columns(df, COLUMNS["players"], all_columns)
 
 
-# This only runs when you start this file directly (python fc27_api.py),
-# not when another script does `from fc27_api import FC27API`.
+# This only runs when you start this file directly (python fc_clubs_api.py),
+# not when another script does `from fc_clubs_api import FC27API`.
 if __name__ == "__main__":
     api = FC27API()
     club_id = api.find_club_id(input("Club name: "))

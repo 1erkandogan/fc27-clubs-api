@@ -18,7 +18,7 @@ import urllib.parse
 from pathlib import Path
 from unittest.mock import patch
 
-from fc27_api import FC27API, FC27APIError
+from fc_clubs_api import FC27API, FC27APIError
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

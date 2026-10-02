@@ -14,7 +14,7 @@ it's that an unwanted change still costs a review, and a merge is permanent.
 These look like oversights. They aren't, and pull requests changing them will be
 closed:
 
-- **The client is one file.** `fc27_api.py` stays a single module. No `src/`
+- **The client is one file.** `fc_clubs_api.py` stays a single module. No `src/`
   layout, no splitting into `client.py` / `models.py` / `parsers.py`.
 - **pandas is the only dependency.** No `requests`, no `httpx`, no `pydantic`.
   The HTTP layer uses `urllib` from the standard library on purpose, so that
@@ -26,9 +26,10 @@ closed:
   through this file line by line and explains every import. Comprehensions,
   clever one-liners, and abstraction layers that make the walkthrough wrong are
   a cost, not an improvement.
-- **No tooling config.** No linters, formatters, pre-commit hooks, CI workflows,
-  type annotations, `pyproject.toml`, or packaging. If the project needs these
-  later, that's a decision for the maintainer.
+- **No tooling config.** No linters, formatters, pre-commit hooks, CI workflows
+  or type annotations. If the project needs these later, that's a decision for
+  the maintainer. `pyproject.toml` exists only to publish the package to PyPI;
+  don't add tool settings to it.
 - **Python 3.9+.** Don't use syntax that requires anything newer.
 
 ## Changes that are welcome

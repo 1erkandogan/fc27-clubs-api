@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fc-clubs-api"
+version = "0.1.0"
+description = "Unofficial Python client for the EA Sports FC 27 Pro Clubs API, returning pandas DataFrames."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE.md" }
+authors = [{ name = "Erkan Dogan" }]
+dependencies = ["pandas>=1.5"]
+keywords = ["ea", "fc27", "pro clubs", "api", "pandas"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/1erkandogan/fc27-clubs-api"
+Issues = "https://github.com/1erkandogan/fc27-clubs-api/issues"
+
+[tool.setuptools]
+py-modules = ["fc_clubs_api"]

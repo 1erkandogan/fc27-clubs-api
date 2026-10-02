@@ -1,7 +1,7 @@
 # Endpoint reference
 
 All endpoints are `GET https://proclubs.ea.com/api/fc/<endpoint>` and need
-`platform=common-gen5` plus the browser-style headers in `fc27_api.py`
+`platform=common-gen5` plus the browser-style headers in `fc_clubs_api.py`
 (`HEADERS`). Without them EA's edge (Akamai) answers **403** or never answers
 (the request hangs until it times out). Plain `curl` is blocked even with the
 headers, while Python (`urllib` or `requests`) gets through.

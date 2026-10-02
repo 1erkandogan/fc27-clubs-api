@@ -1,11 +1,11 @@
-# How it works: a beginner's guide to `fc27_api.py`
+# How it works: a beginner's guide to `fc_clubs_api.py`
 
-This guide walks through [`fc27_api.py`](../fc27_api.py) from top to bottom. It covers
+This guide walks through [`fc_clubs_api.py`](../fc_clubs_api.py) from top to bottom. It covers
 what each part does, why it is there, and where plain Python was enough and where
 it wasn't. You only need basic Python: variables, lists, dicts, `for` loops, `if`
 and functions.
 
-Keep `fc27_api.py` open next to this page while you read.
+Keep `fc_clubs_api.py` open next to this page while you read.
 
 ---
 
@@ -25,7 +25,7 @@ EA answers with **JSON**, which is text that looks almost exactly like Python di
 ```
 
 That URL is an **API endpoint**: a web address that returns data instead of a web page.
-`fc27_api.py` does what the browser does:
+`fc_clubs_api.py` does what the browser does:
 
 1. build the URL,
 2. send the request,
@@ -56,7 +56,8 @@ The first four come **with Python**, so you don't need to install anything:
 | `urllib.request` | Sending the request to EA (`Request`, `urlopen`). |
 | `urllib.error` | The error urllib raises when EA answers with an error code such as 403 (`HTTPError`). |
 
-`pandas` is the **only** thing you have to install (`pip install pandas`). Section 2.2 explains why.
+`pandas` is the **only** thing you have to install, and `pip install fc-clubs-api`
+installs it for you. Section 2.2 explains why it's needed.
 
 ### 2.1 Why not `requests`?
 
@@ -499,12 +500,12 @@ if __name__ == "__main__":
 ```
 
 The code under this line runs only when you start the file directly
-(`python fc27_api.py`), as a quick demo. It does **not** run when your own script
-imports the file with `from fc27_api import FC27API`.
+(`python fc_clubs_api.py`), as a quick demo. It does **not** run when your own script
+imports the file with `from fc_clubs_api import FC27API`.
 
 ---
 
-## 9. The tests (`tests/test_fc27_api.py`)
+## 9. The tests (`tests/test_fc_clubs_api.py`)
 
 The tests check that every method still produces the right table. They **never contact EA**:
 
