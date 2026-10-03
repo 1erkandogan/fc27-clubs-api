@@ -195,7 +195,8 @@ Current-season stats. Returns `{members: [...], positionCount: {...}}`.
   `favoritePosition`, `proName`, `proPos`, `proStyle`, `proHeight`, `proNationality`
   and `proOverallStr` are `""` for them.
 - `positionCount` counts `favoritePosition`, leaving out those `""` members. The client
-  drops it; use `df["favoritePosition"].value_counts()` instead (it counts `""` too).
+  drops it; count the `position` column of `get_member_stats` instead, e.g.
+  `Counter(m["position"] for m in members)` (it counts `""` too).
 
 ## members/career/stats
 

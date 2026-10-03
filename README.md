@@ -102,7 +102,7 @@ FC27API(output="dataframe")                      # DataFrames for every call
 ```python
 from fc_clubs_api import FC27API
 
-api = FC27API(timezone="Europe/London")
+api = FC27API(output="dataframe", timezone="Europe/London")   # needs fc-clubs-api[pandas]
 club_id = api.find_club_id("Your Club Name")
 
 # Top 5 scorers this season
