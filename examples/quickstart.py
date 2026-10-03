@@ -9,7 +9,7 @@ import sys
 from fc_clubs_api import FC27API, AmbiguousClubError, ClubNotFoundError
 
 club_name = sys.argv[1] if len(sys.argv) > 1 else input("Club name: ")
-api = FC27API(timezone="Europe/London")
+api = FC27API(output="dataframe", timezone="Europe/London")
 
 try:
     club_id = api.find_club_id(club_name)

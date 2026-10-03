@@ -4,11 +4,11 @@ Quick start::
 
     from fc_clubs_api import FC27API
 
-    api = FC27API()                          # pandas DataFrames by default
+    api = FC27API()                          # list of dicts by default
     club_id = api.find_club_id("Example FC")
-    api.get_club_matches(club_id)            # DataFrame
-    api.get_club_matches(club_id, output="records")  # list of dicts
-    api.get_club_matches(club_id, output="raw")      # EA's JSON
+    api.get_club_matches(club_id)            # list of dicts
+    api.get_club_matches(club_id, output="dataframe")  # pandas DataFrame
+    api.get_club_matches(club_id, output="raw")        # EA's JSON
 
 Documentation: https://1erkandogan.github.io/fc27-clubs-api/
 """

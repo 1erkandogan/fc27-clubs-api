@@ -63,7 +63,7 @@ class FC27API:
             :class:`~fc_clubs_api.FC27ConnectionError`.
         timezone: IANA name (``"Europe/Istanbul"``) or ``tzinfo`` used for match
             timestamps in ``records``/``dataframe`` output. Default UTC.
-        output: Default output format: ``"dataframe"`` (default), ``"records"``
+        output: Default output format: ``"records"`` (default), ``"dataframe"``
             or ``"raw"``, or an :class:`~fc_clubs_api.OutputFormat`.
         headers: Extra or replacement HTTP headers, merged over the built-in
             browser-like headers EA requires.
@@ -82,13 +82,13 @@ class FC27API:
         platform: Union[Platform, str] = Platform.GEN5,
         timeout: float = 10,
         timezone: TimezoneLike = "UTC",
-        output: OutputLike = OutputFormat.DATAFRAME,
+        output: OutputLike = OutputFormat.RECORDS,
         headers: Optional[Mapping[str, str]] = None,
     ) -> None:
         self.platform = str(platform)
         self.timeout = timeout
         self.timezone = timezone
-        self.output = resolve_output(output, OutputFormat.DATAFRAME)
+        self.output = resolve_output(output, OutputFormat.RECORDS)
         self.headers: Dict[str, str] = {**HEADERS, **(headers or {})}
 
     def __repr__(self) -> str:

@@ -9,7 +9,8 @@ what you are building.
 | `"records"` | `list[dict]`, one flat, typed dict per row | Web backends, bots, JSON APIs, ORMs, anything without pandas | nothing |
 | `"dataframe"` | `pandas.DataFrame` | Analysis, notebooks, CSV/Excel export | `pip install "fc-clubs-api[pandas]"` |
 
-`"dataframe"` is the default, so code written for 0.1 keeps working.
+`"records"` is the default, so a plain `pip install fc-clubs-api` works without pandas.
+Pass `output="dataframe"` on the client or per call for DataFrames.
 
 ## Choosing a format
 
@@ -18,11 +19,11 @@ Set a default on the client, override it on any call:
 ```python
 from fc_clubs_api import FC27API, OutputFormat
 
-api = FC27API(output="records")                    # default for every call
+api = FC27API(output="dataframe")                  # default for every call
 
-api.get_member_stats(1001)                         # -> list[dict]
+api.get_member_stats(1001)                         # -> DataFrame
 api.get_member_stats(1001, output="raw")           # -> EA's JSON
-api.get_member_stats(1001, output="dataframe")     # -> DataFrame
+api.get_member_stats(1001, output="records")       # -> list[dict]
 
 api.get_member_stats(1001, output=OutputFormat.RAW)  # the enum works too
 ```

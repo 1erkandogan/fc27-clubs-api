@@ -29,7 +29,7 @@ pitch third, positioning feedback and more.
 ```python
 from fc_clubs_api import FC27API
 
-api = FC27API()
+api = FC27API(output="dataframe")
 players = api.get_match_players(club_id, include_events=True)
 
 players[["name", "passesCompleted", "passesCompletedForward",

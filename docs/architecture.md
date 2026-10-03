@@ -136,10 +136,10 @@ are never overwritten by a decoded value. See [Match events](match-events.md).
 ## Output formats (`_output.py`)
 
 `OutputFormat` is a `str` enum, so `"records"` and `OutputFormat.RECORDS` are
-interchangeable. The client stores a default; each method's `output=None` means
-"use the default". When the result will be a DataFrame, pandas is imported
-**before** the request is sent, so a missing install fails immediately with an
-install hint instead of after a network round trip.
+interchangeable. The client stores a default (`records`, so a plain install never
+needs pandas); each method's `output=None` means "use the default". When the result
+will be a DataFrame, pandas is imported **before** the request is sent, so a missing
+install fails immediately with an install hint instead of after a network round trip.
 
 ## Tests
 

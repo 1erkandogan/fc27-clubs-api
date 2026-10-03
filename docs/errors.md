@@ -30,7 +30,7 @@ except AmbiguousClubError as error:
     raise
 
 try:
-    df = api.get_member_stats(club_id)
+    members = api.get_member_stats(club_id)
 except FC27HTTPError as error:
     if error.status_code == 403:
         print("Blocked by EA's edge. Wait, and check the headers still work.")

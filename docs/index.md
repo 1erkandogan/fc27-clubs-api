@@ -9,7 +9,7 @@ from fc_clubs_api import FC27API
 
 api = FC27API()
 club_id = api.find_club_id("Example FC")
-api.get_club_matches(club_id)        # last 10 league matches, as a DataFrame
+api.get_club_matches(club_id)        # last 10 league matches, as a list of dicts
 ```
 
 <div class="grid cards" markdown>

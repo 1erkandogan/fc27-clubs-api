@@ -5,6 +5,16 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/). While the version is 0.x, minor
 releases may contain breaking changes; they are always listed under **Changed**.
 
+## [0.3.0] - 2026-10-03
+
+### Changed
+
+- **Breaking: the default output is now `records`.** In 0.2.0 the default was
+  `dataframe`, so `FC27API().get_club_matches(...)` raised `ImportError` on a plain
+  `pip install fc-clubs-api`. Methods now return lists of dicts unless asked otherwise.
+  For DataFrames, install `fc-clubs-api[pandas]` and pass `output="dataframe"` per call
+  or set it once with `FC27API(output="dataframe")`.
+
 ## [0.2.0] - 2026-10-03
 
 The client is now a proper package with three output formats, decoded match events
@@ -68,6 +78,7 @@ and full documentation.
 First release: `FC27API` with club search, details, overall stats, member and career
 stats, matches and per-player match stats as pandas DataFrames.
 
-[0.2.0]: https://github.com/1erkandogan/fc27-clubs-api/compare/8001299...HEAD
+[0.3.0]: https://github.com/1erkandogan/fc27-clubs-api/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/1erkandogan/fc27-clubs-api/compare/8001299...v0.2.0
 [0.1.1]: https://github.com/1erkandogan/fc27-clubs-api/commit/8001299
 [0.1.0]: https://github.com/1erkandogan/fc27-clubs-api/commit/5cb18c8

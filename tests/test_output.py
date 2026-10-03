@@ -63,7 +63,7 @@ def test_dataframe_matches_records(method, fixture_name, kwargs):
     arg = "example" if method == "search_club_by_name" else 1001
     with fake_ea(fixture(fixture_name)):
         records = getattr(api, method)(arg, output="records", **kwargs)
-        df = getattr(api, method)(arg, **kwargs)  # dataframe is the default
+        df = getattr(api, method)(arg, output="dataframe", **kwargs)
 
     assert isinstance(df, pd.DataFrame)
     assert list(df.columns) == list(records[0])
@@ -80,7 +80,7 @@ def test_dataframe_matches_records(method, fixture_name, kwargs):
 def test_dataframe_types_and_timezone():
     pytest.importorskip("pandas")
     with fake_ea(fixture("matches")):
-        df = FC27API().get_club_matches(1001)
+        df = FC27API(output="dataframe").get_club_matches(1001)
     assert str(df["timestamp"].dt.tz) == "UTC"
     assert df["goals"].dtype.kind == "i"
 
@@ -88,7 +88,7 @@ def test_dataframe_types_and_timezone():
 def test_empty_dataframe():
     pd = pytest.importorskip("pandas")
     with fake_ea([]):
-        df = FC27API().get_club_matches(1001, "playoffMatch")
+        df = FC27API(output="dataframe").get_club_matches(1001, "playoffMatch")
     assert isinstance(df, pd.DataFrame)
     assert df.empty
 
@@ -96,8 +96,17 @@ def test_empty_dataframe():
 def test_missing_pandas_fails_before_any_request(no_pandas):
     message = r"fc-clubs-api\[pandas\]"
     with fake_ea(fixture("info")) as fake, pytest.raises(ImportError, match=message):
-        FC27API().get_club_details(1001)
+        FC27API(output="dataframe").get_club_details(1001)
     fake.assert_not_called()
+
+
+def test_default_output_is_records_without_pandas(no_pandas):
+    api = FC27API()
+    assert api.output is OutputFormat.RECORDS
+    with fake_ea(fixture("info")):
+        rows = api.get_club_details(1001)
+    assert isinstance(rows, list)
+    assert rows[0]["clubId"] == 1001
 
 
 def test_records_and_raw_work_without_pandas(no_pandas):

@@ -16,7 +16,7 @@ from fc_clubs_api import FC27API
 
 api = FC27API()
 club_id = api.find_club_id("Your Club Name")
-api.get_club_matches(club_id)    # last 10 league matches
+api.get_club_matches(club_id)    # last 10 league matches, as a list of dicts
 ```
 
 **[Documentation](https://1erkandogan.github.io/fc27-clubs-api/)** ·
@@ -53,7 +53,7 @@ No API key needed; the data is public.
 
 ## Output formats
 
-The same data, three ways. `dataframe` is the default.
+The same data, three ways. `records` is the default, so a plain install needs no pandas.
 
 | Format | Returns | For |
 |---|---|---|
@@ -64,11 +64,13 @@ The same data, three ways. `dataframe` is the default.
 ```python
 from fc_clubs_api import FC27API
 
-api = FC27API(output="records", timezone="Europe/London")   # client default
+api = FC27API(timezone="Europe/London")
 
-api.get_member_stats(1001)                       # list of dicts
+api.get_member_stats(1001)                       # list of dicts (default)
 api.get_member_stats(1001, output="raw")         # {"members": [...], "positionCount": {...}}
-api.get_member_stats(1001, output="dataframe")   # DataFrame
+api.get_member_stats(1001, output="dataframe")   # DataFrame (needs pandas)
+
+FC27API(output="dataframe")                      # DataFrames for every call
 ```
 
 [More on output formats →](https://1erkandogan.github.io/fc27-clubs-api/output-formats/)

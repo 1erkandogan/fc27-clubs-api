@@ -10,7 +10,7 @@ Python 3.9 or newer.
     pip install "fc-clubs-api[pandas]"
     ```
 
-    Methods return pandas DataFrames by default.
+    Pass `output="dataframe"` (on the client or per call) to get pandas DataFrames.
 
 === "Without pandas (apps, bots)"
 
@@ -18,7 +18,7 @@ Python 3.9 or newer.
     pip install fc-clubs-api
     ```
 
-    No third-party dependencies. Use `output="records"` or `output="raw"`.
+    No third-party dependencies. Methods return lists of dicts (`records`) by default.
 
 No API key or account is needed; the data is public.
 
@@ -49,7 +49,7 @@ FC27API(
     platform="common-gen5",   # PS5 / Xbox Series / PC; the only one verified for FC 27
     timeout=10,               # seconds before FC27ConnectionError
     timezone="UTC",           # IANA name or tzinfo for match timestamps
-    output="dataframe",       # default format: "dataframe", "records" or "raw"
+    output="records",         # default format: "records", "dataframe" or "raw"
     headers=None,             # extra HTTP headers, merged over the defaults
 )
 ```

@@ -12,6 +12,8 @@ club_id = api.find_club_id("Your Club Name")
 ## With pandas
 
 ```python
+api = FC27API(output="dataframe", timezone="Europe/London")
+
 # Top 5 scorers this season
 members = api.get_member_stats(club_id)
 members.sort_values("goals", ascending=False).head(5)[["name", "goals", "assists"]]
@@ -38,9 +40,9 @@ members.to_excel("members.xlsx", index=False)   # needs: pip install openpyxl
 
 ## Without pandas
 
-```python
-api = FC27API(output="records")
+Records are the default, so the `api` from the top of the page works as is.
 
+```python
 members = api.get_member_stats(club_id)
 top = sorted(members, key=lambda m: m["goals"], reverse=True)[:5]
 for m in top:
@@ -53,6 +55,7 @@ print(form)   # e.g. "WWDLW..."
 ## Match events
 
 ```python
+api = FC27API(output="dataframe")
 players = api.get_match_players(club_id, include_events=True)
 
 # Who progresses the ball? Share of completed passes played forward

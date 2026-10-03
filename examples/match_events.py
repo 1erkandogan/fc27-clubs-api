@@ -8,7 +8,7 @@ import sys
 from fc_clubs_api import FC27API
 
 club_id = int(sys.argv[1]) if len(sys.argv) > 1 else int(input("Club id: "))
-api = FC27API()
+api = FC27API(output="dataframe")
 
 players = api.get_match_players(club_id, include_events=True)
 totals = players.groupby("name")[
