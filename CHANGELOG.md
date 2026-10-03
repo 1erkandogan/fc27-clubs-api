@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/). While the version is 0.x, minor
 releases may contain breaking changes; they are always listed under **Changed**.
 
+## [0.3.1] - 2026-10-03
+
+### Fixed
+
+- README examples now create the client with `output="dataframe"` before using pandas
+  methods, since `records` became the default in 0.3.0.
+- The `members/stats` endpoint notes count positions from the cleaned `position`
+  column, with no pandas needed.
+
 ## [0.3.0] - 2026-10-03
 
 ### Changed
@@ -78,7 +87,8 @@ and full documentation.
 First release: `FC27API` with club search, details, overall stats, member and career
 stats, matches and per-player match stats as pandas DataFrames.
 
-[0.3.0]: https://github.com/1erkandogan/fc27-clubs-api/compare/v0.2.0...HEAD
+[0.3.1]: https://github.com/1erkandogan/fc27-clubs-api/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/1erkandogan/fc27-clubs-api/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/1erkandogan/fc27-clubs-api/compare/8001299...v0.2.0
 [0.1.1]: https://github.com/1erkandogan/fc27-clubs-api/commit/8001299
 [0.1.0]: https://github.com/1erkandogan/fc27-clubs-api/commit/5cb18c8
